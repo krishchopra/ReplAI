@@ -71,7 +71,8 @@ def parse_imessage_html(html_content: str, filename: str = "") -> Optional[Dict[
                 timestamp_text = timestamp_link.get_text(strip=True)
                 timestamp_dt = parse_timestamp(timestamp_text)
                 if timestamp_dt:
-                    timestamp = timestamp_dt.isoformat()
+                    # Format with milliseconds and timezone (UTC)
+                    timestamp = timestamp_dt.strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
                     timestamps.append(timestamp_dt)
         
         # Determine role
@@ -104,9 +105,9 @@ def parse_imessage_html(html_content: str, filename: str = "") -> Optional[Dict[
     # Determine chat type
     chat_type = 'direct' if len(authors) <= 2 else 'group'
     
-    # Get first and last timestamps
-    first_timestamp = timestamps[0].isoformat() if timestamps else None
-    last_timestamp = timestamps[-1].isoformat() if timestamps else None
+    # Get first and last timestamps with proper format
+    first_timestamp = timestamps[0].strftime("%Y-%m-%dT%H:%M:%S.000+00:00") if timestamps else None
+    last_timestamp = timestamps[-1].strftime("%Y-%m-%dT%H:%M:%S.000+00:00") if timestamps else None
     
     return {
         'openai_messages': openai_messages,
