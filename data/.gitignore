@@ -1,0 +1,40 @@
+# Output directories
+output/
+processed_chats/
+my_chats/
+
+# Test data
+test_data/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive data - Instagram exports may contain private messages
+instagram-data/
+instagram_data/
+messages/
+inbox/
+
+# Any JSON output files in root
+/*.json
+
