@@ -1,1 +1,1 @@
-python discord_parser.py --data-dir data/raw/discord --output data/processed/discord_parsed.json --stats
+python utils/discord_parser.py --data-dir data/raw/discord --output data/processed/discord_parsed.json --stats

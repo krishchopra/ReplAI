@@ -24,7 +24,7 @@ class DiscordParser:
         Parse all Discord JSON files in the data directory.
         
         Returns:
-            List of parsed conversations with all metadata
+            List of parsed conversations with all metadata (empty conversations are excluded)
         """
         conversations = []
         
@@ -35,7 +35,9 @@ class DiscordParser:
             try:
                 # parse_conversation returns a single conversation dict
                 conversation = self.parse_conversation(json_file)
-                conversations.append(conversation)
+                # Only include non-empty conversations
+                if conversation['total_messages'] > 0:
+                    conversations.append(conversation)
             except Exception as e:
                 print(f"Error parsing {json_file.name}: {e}")
                 continue
