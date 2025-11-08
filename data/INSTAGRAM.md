@@ -212,7 +212,3 @@ output/
 
 - Messages without text content (photos only, reactions) are filtered out
 - Check the original JSON file to verify the content exists
-
-## License
-
-MIT License - feel free to modify and use as needed!
