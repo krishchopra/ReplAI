@@ -1,15 +1,16 @@
 # Instagram Message Parser
 
-Convert your Instagram message data into OpenAI-compatible chat format for training or analysis.
+Convert your Instagram message data into OpenAI-compatible chat format for training a model to talk like you.
 
 ## Features
 
 - ✅ Parses Instagram's exported message.json files
 - ✅ Handles Unicode encoding issues in Instagram exports
-- ✅ Converts to OpenAI chat format with proper role assignments
+- ✅ Converts to OpenAI chat format with proper role assignments for training
 - ✅ Supports both individual and group conversations
 - ✅ Filters out non-content messages (like "Liked a message")
 - ✅ Chronological message ordering
+- ✅ Time-based filtering (train on specific date ranges)
 - ✅ Two output modes: combined or separate files
 
 ## Installation
@@ -21,7 +22,7 @@ No additional dependencies required! Uses only Python standard library.
 ### Basic Usage
 
 ```bash
-python parse_instagram_messages.py /path/to/instagram/messages
+python3 parse_instagram_messages.py /path/to/instagram/messages --user-name "Your Display Name"
 ```
 
 This will:
@@ -33,49 +34,80 @@ This will:
 ### Command Line Options
 
 ```bash
-python parse_instagram_messages.py <input_dir> [options]
+python3 parse_instagram_messages.py <input_dir> --user-name <name> [options]
 ```
 
-**Arguments:**
+**Required Arguments:**
 
-- `input_dir` - Root directory containing your Instagram message folders (required)
+- `input_dir` - Root directory containing your Instagram message folders
+- `--user-name NAME` - Your display name as it appears in Instagram messages (case-insensitive)
 
-**Options:**
+**Optional Arguments:**
 
-- `--user-name NAME` - Your name as it appears in Instagram (default: "krish")
 - `--format {combined|separate}` - Output format (default: separate)
   - `combined` - All conversations in one file
   - `separate` - One file per conversation
 - `--output-dir DIR` - Directory to save output files (default: "output")
+- `--start-time DATE` - Only include messages from this date onward (format: YYYY-MM-DD or unix timestamp)
+- `--end-time DATE` - Only include messages up to this date (format: YYYY-MM-DD or unix timestamp)
 
 ### Examples
 
-**Parse messages with custom username:**
+**Basic parsing:**
 
 ```bash
-python parse_instagram_messages.py ./instagram_data --user-name "John Doe"
+python3 parse_instagram_messages.py ./instagram_data --user-name "John Doe"
 ```
 
 **Combine all conversations into one file:**
 
 ```bash
-python parse_instagram_messages.py ./instagram_data --format combined
+python3 parse_instagram_messages.py ./instagram_data --user-name "John Doe" --format combined
 ```
 
-**Custom output directory:**
+**Filter by date range (e.g., only 2024 messages):**
 
 ```bash
-python parse_instagram_messages.py ./instagram_data --output-dir ./processed_chats
+python3 parse_instagram_messages.py ./instagram_data --user-name "John Doe" \
+  --start-time "2024-01-01" --end-time "2024-12-31"
+```
+
+**Train on recent conversations only:**
+
+```bash
+python3 parse_instagram_messages.py ./instagram_data --user-name "John Doe" \
+  --start-time "2023-01-01"
+```
+
+**Complete example with all options:**
+
+```bash
+python3 parse_instagram_messages.py ./instagram_data \
+  --user-name "John Doe" \
+  --format combined \
+  --start-time "2023-01-01" \
+  --output-dir ./training_data
 ```
 
 ## How to Get Your Instagram Data
 
-1. Go to Instagram Settings → Security → Download Data
-2. Request a download of your information
-3. Select JSON format
-4. Wait for Instagram to prepare your download (can take a few days)
-5. Extract the zip file
-6. Look for the `messages` or `inbox` folder
+To download your Instagram data from Meta Accounts Center:
+
+1. **Open Instagram** and go to your profile by tapping your profile picture in the bottom right corner
+2. **Access the menu** by tapping the three horizontal lines (hamburger menu) in the top right corner
+3. **Navigate to Accounts Center** by tapping "Accounts Center"
+4. **Go to your information and permissions** and select "Download your information"
+5. **Initiate the export** by tapping "Download or transfer information"
+6. **Select your profile** and tap "Next"
+7. **Choose what to download** - You can download "All available information" or select specific types
+8. **Choose a destination** - Select "Export to device" and tap "Next"
+9. **Select your file options:**
+   - **Format:** Choose **JSON** (for use with this script)
+   - **Date range:** Select the time period you want to download
+   - **Media quality:** Adjust the quality for photos and videos
+10. **Submit your request** by tapping "Create files" or "Start export"
+11. **Wait for the download** - You'll be notified via email when it's ready (can take a few hours to days)
+12. **Extract the zip file** and look for the `messages` or `inbox` folder
 
 ## Output Format
 
@@ -83,12 +115,7 @@ The script converts messages to this format:
 
 ```json
 {
-  "model": "gpt-4o",
   "messages": [
-    {
-      "role": "system",
-      "content": "You are a helpful assistant having a conversation."
-    },
     {
       "role": "user",
       "content": "Hey, how's it going?"
@@ -96,16 +123,25 @@ The script converts messages to this format:
     {
       "role": "assistant",
       "content": "Good! What are you up to?"
+    },
+    {
+      "role": "user",
+      "content": "What are you working on?"
+    },
+    {
+      "role": "assistant",
+      "content": "Just coding some cool stuff!"
     }
   ]
 }
 ```
 
-**Role Assignment:**
+**Role Assignment for Training:**
 
-- `user` - Messages sent by you (the specified user-name)
-- `assistant` - Messages from all other participants
-- `system` - Initial system message (added automatically)
+- `assistant` - **Your messages** (the specified --user-name) - this is what the model learns to imitate
+- `user` - **Everyone else's messages** - these are the prompts/context the model responds to
+
+This role assignment is designed for training a model to talk like you. Your messages become the "assistant" responses that the model learns to generate.
 
 ## Features Explained
 
