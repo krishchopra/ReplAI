@@ -6,7 +6,7 @@ dotenv.config();
 
 // Configuration
 const TARGET_PHONE = process.env["TARGET_PHONE"];
-const POLL_INTERVAL_MS = 2000; // Check every 2 seconds
+const POLL_INTERVAL_MS = 4000; // Check every 4 seconds
 const SYSTEM_PROMPT = `You are texting casually with a friend. Keep it real and chill.
 
 Style:
