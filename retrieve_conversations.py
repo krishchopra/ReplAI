@@ -175,7 +175,7 @@ class ConversationRetriever:
             print(f"Total Messages: {result['total_messages']}")
             print(f"Tags: {', '.join(result['tags'][:5])}")
             
-            print(f"\nMatching message:")
+            print("\nMatching message:")
             content = result['matching_message'] or '[No content]'
             if len(content) > 300:
                 content = content[:300] + "..."
@@ -183,7 +183,7 @@ class ConversationRetriever:
                 print(f"  {line}")
             
             if show_context:
-                print(f"\nConversation context (around matching message):")
+                print("\nConversation context (around matching message):")
                 messages = self.get_conversation_context(
                     result['conversation_id'],
                     matching_message_id=result.get('matching_message_id'),
