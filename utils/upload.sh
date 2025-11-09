@@ -23,7 +23,7 @@ echo "✓ Merge complete"
 
 # Partition into training chunks
 echo "Step 3/5: Partitioning conversations..."
-python utils/partition.py data/merged/all_conversations.json -o data/merged/all_conversations_partitioned.json --max-days 7
+python utils/partition.py data/merged/all_conversations.json -o data/merged/all_conversations_partitioned.json --max-days 2
 if [ ! -f "data/merged/all_conversations_partitioned.json" ]; then
     echo "Error: partition failed - output file not found"
     exit 1
@@ -68,7 +68,7 @@ fi
 echo "Uploading dataset to Hugging Face..."
 env HF_TOKEN="$HF_TOKEN_VALUE" python utils/upload_dataset.py \
   data/merged/all_conversations_encrypted.json \
-  --repo-id Stephen-Xie/chat-dataset \
+  --repo-id Stephen-Xie/chat-dataset-2 \
   --token "$HF_TOKEN_VALUE"
 echo "✓ Upload complete"
 
