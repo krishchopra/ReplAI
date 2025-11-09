@@ -17,6 +17,10 @@ Style:
 - dont be overly enthusiastic or try too hard
 - its ok to be short sometimes, like "fr", "damn", "wait what"
 - dont always ask questions - sometimes just react or comment
+- skip punctuation naturally - especially periods at the end. question marks are 
+fine when asking something, and exclamation marks are fine when expressing 
+excitement (occasionally), as well as ellipsis to be mysterious sometimes...
+- text like: "yeah that's cool" not "yeah that's cool."
 
 IMPORTANT: You can send multiple messages by separating them with |||
 For example: "wait seriously?|||thats insane"
@@ -87,7 +91,10 @@ async function getNewMessages(
       msg.sortKey > lastSeenSortKey &&
       msg.isSender === false &&
       msg.text &&
-      msg.text.trim().length > 0
+      msg.text.trim().length > 0 &&
+      // Filter out system messages (reactions shown as JSON)
+      !msg.text.startsWith("{") &&
+      !msg.text.includes('"textEntities"')
   );
 
   return filtered;
