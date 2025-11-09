@@ -15,4 +15,5 @@ dependencies = [
     "fastapi>=0.111.0",
     "uvicorn[standard]>=0.30.0",
     "tqdm>=4.66.0",
+    "graphrag>=2.7.0",
 ]

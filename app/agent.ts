@@ -107,20 +107,23 @@ async function generateResponse(
   conversationHistory: { role: "user" | "assistant"; content: string }[],
   abortSignal?: AbortSignal
 ): Promise<string> {
-  const completion = await openai.chat.completions.create(
+  // Format conversation history as input text
+  let inputText = SYSTEM_PROMPT + "\n\nConversation:\n";
+  for (const msg of conversationHistory) {
+    const role = msg.role === "user" ? "User" : "Assistant";
+    inputText += `${role}: ${msg.content}\n`;
+  }
+  inputText += "Assistant:";
+
+  const response = await openai.responses.create(
     {
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...conversationHistory,
-      ],
-      temperature: 0.8,
-      max_tokens: 200,
+      model: "gpt-5-nano",
+      input: inputText,
     },
     { signal: abortSignal }
   );
 
-  return completion.choices[0].message.content || "👍";
+  return response.output_text || "👍";
 }
 
 async function sendMessage(

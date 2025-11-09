@@ -49,7 +49,7 @@ npm run agent
 The agent will:
 
 - Monitor messages from the TARGET_PHONE number
-- Generate responses using GPT-4o-mini
+- Generate responses using GPT-5-nano
 - Send responses automatically
 - Keep a conversation history for context
 - Run continuously until you press Ctrl+C
