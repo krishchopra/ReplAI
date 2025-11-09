@@ -1,0 +1,186 @@
+100%|████████████████████████████████████| 90/90 [00:39<00:00,  2.66it/s][INFO|trainer.py:4309] 2025-11-09 04:49:21,993 >> Saving model checkpoint to saves/Custom/lora/train_2025-11-09-04-47-30/checkpoint-90
+{'loss': 5.6982, 'grad_norm': 0.4655018448829651, 'learning_rate': 4.975670171853926e-05, 'epoch': 0.17, 'num_input_tokens_seen': 1848, 'train_runtime': 4.6975, 'train_tokens_per_second': 393.403}
+{'loss': 4.1811, 'grad_norm': 0.3606904149055481, 'learning_rate': 4.877641290737884e-05, 'epoch': 0.33, 'num_input_tokens_seen': 3864, 'train_runtime': 6.583, 'train_tokens_per_second': 586.965}
+{'loss': 3.2399, 'grad_norm': 0.33972424268722534, 'learning_rate': 4.707368982147318e-05, 'epoch': 0.5, 'num_input_tokens_seen': 5712, 'train_runtime': 8.7793, 'train_tokens_per_second': 650.623}
+{'loss': 3.3352, 'grad_norm': 0.3391130864620209, 'learning_rate': 4.4700268840168045e-05, 'epoch': 0.67, 'num_input_tokens_seen': 7416, 'train_runtime': 11.2523, 'train_tokens_per_second': 659.067}
+{'loss': 3.1154, 'grad_norm': 0.8119035363197327, 'learning_rate': 4.172826515897146e-05, 'epoch': 0.83, 'num_input_tokens_seen': 9144, 'train_runtime': 13.1111, 'train_tokens_per_second': 697.425}
+{'loss': 3.3255, 'grad_norm': 0.3270891308784485, 'learning_rate': 3.824798160583012e-05, 'epoch': 1.0, 'num_input_tokens_seen': 10680, 'train_runtime': 14.9701, 'train_tokens_per_second': 713.421}
+{'loss': 3.0516, 'grad_norm': 0.29396289587020874, 'learning_rate': 3.436516483539781e-05, 'epoch': 1.17, 'num_input_tokens_seen': 12744, 'train_runtime': 16.9653, 'train_tokens_per_second': 751.181}
+{'loss': 2.8157, 'grad_norm': 0.41361159086227417, 'learning_rate': 3.0197792270443982e-05, 'epoch': 1.33, 'num_input_tokens_seen': 14656, 'train_runtime': 19.5297, 'train_tokens_per_second': 750.445}
+{'loss': 3.1557, 'grad_norm': 0.4582298994064331, 'learning_rate': 2.587248741756253e-05, 'epoch': 1.5, 'num_input_tokens_seen': 16528, 'train_runtime': 21.4341, 'train_tokens_per_second': 771.106}
+{'loss': 2.7506, 'grad_norm': 0.39708036184310913, 'learning_rate': 2.1520672475998373e-05, 'epoch': 1.67, 'num_input_tokens_seen': 18088, 'train_runtime': 23.7316, 'train_tokens_per_second': 762.191}
+{'loss': 2.9296, 'grad_norm': 0.4482770264148712, 'learning_rate': 1.7274575140626318e-05, 'epoch': 1.83, 'num_input_tokens_seen': 19824, 'train_runtime': 26.0526, 'train_tokens_per_second': 760.923}
+{'loss': 2.6604, 'grad_norm': 0.30195629596710205, 'learning_rate': 1.3263210930352737e-05, 'epoch': 2.0, 'num_input_tokens_seen': 21456, 'train_runtime': 28.3172, 'train_tokens_per_second': 757.701}
+{'loss': 2.2808, 'grad_norm': 0.49979186058044434, 'learning_rate': 9.608463116858542e-06, 'epoch': 2.17, 'num_input_tokens_seen': 23216, 'train_runtime': 30.1911, 'train_tokens_per_second': 768.968}
+{'loss': 2.5727, 'grad_norm': 0.3658715486526489, 'learning_rate': 6.421379363065142e-06, 'epoch': 2.33, 'num_input_tokens_seen': 25144, 'train_runtime': 32.0715, 'train_tokens_per_second': 783.999}
+{'loss': 2.6121, 'grad_norm': 0.4706892967224121, 'learning_rate': 3.798797596089351e-06, 'epoch': 2.5, 'num_input_tokens_seen': 26904, 'train_runtime': 34.3883, 'train_tokens_per_second': 782.359}
+{'loss': 2.8433, 'grad_norm': 0.3505610525608063, 'learning_rate': 1.8204036358303173e-06, 'epoch': 2.67, 'num_input_tokens_seen': 28712, 'train_runtime': 36.5734, 'train_tokens_per_second': 785.051}
+{'loss': 2.7909, 'grad_norm': 0.5048277974128723, 'learning_rate': 5.463099816548579e-07, 'epoch': 2.83, 'num_input_tokens_seen': 30368, 'train_runtime': 38.403, 'train_tokens_per_second': 790.771}
+{'loss': 2.771, 'grad_norm': 0.38350555300712585, 'learning_rate': 1.522932452260595e-08, 'epoch': 3.0, 'num_input_tokens_seen': 32104, 'train_runtime': 40.2794, 'train_tokens_per_second': 797.033}
+[INFO|configuration_utils.py:765] 2025-11-09 04:49:22,091 >> loading configuration file config.json from cache at /data/stephenx/huggingface/hub/models--NousResearch--Hermes-4-14B/snapshots/950b468d52a607d0b9b7a91b8f4a6a5ad5132dda/config.json
+[INFO|configuration_utils.py:839] 2025-11-09 04:49:22,092 >> Model config Qwen3Config {
+  "architectures": [
+    "Qwen3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "dtype": "bfloat16",
+  "eos_token_id": 151645,
+  "head_dim": 128,
+  "hidden_act": "silu",
+  "hidden_size": 5120,
+  "initializer_range": 0.02,
+  "intermediate_size": 17408,
+  "layer_types": [
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention"
+  ],
+  "max_position_embeddings": 40960,
+  "max_window_layers": 40,
+  "model_type": "qwen3",
+  "num_attention_heads": 40,
+  "num_hidden_layers": 40,
+  "num_key_value_heads": 8,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000,
+  "sliding_window": null,
+  "tie_word_embeddings": false,
+  "transformers_version": "4.57.1",
+  "use_cache": false,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|<string>:466] 2025-11-09 04:49:22,639 >>
+
+Training completed. Do not forget to share your model on huggingface.co/models =)
+
+
+100%|████████████████████████████████████| 90/90 [00:40<00:00,  2.25it/s]
+{'train_runtime': 40.9279, 'train_samples_per_second': 17.152, 'train_steps_per_second': 2.199, 'train_loss': 3.118313185373942, 'epoch': 3.0, 'num_input_tokens_seen': 32104}
+[INFO|trainer.py:4309] 2025-11-09 04:49:22,643 >> Saving model checkpoint to saves/Custom/lora/train_2025-11-09-04-47-30
+[INFO|configuration_utils.py:765] 2025-11-09 04:49:22,718 >> loading configuration file config.json from cache at /data/stephenx/huggingface/hub/models--NousResearch--Hermes-4-14B/snapshots/950b468d52a607d0b9b7a91b8f4a6a5ad5132dda/config.json
+[INFO|configuration_utils.py:839] 2025-11-09 04:49:22,719 >> Model config Qwen3Config {
+  "architectures": [
+    "Qwen3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "dtype": "bfloat16",
+  "eos_token_id": 151645,
+  "head_dim": 128,
+  "hidden_act": "silu",
+  "hidden_size": 5120,
+  "initializer_range": 0.02,
+  "intermediate_size": 17408,
+  "layer_types": [
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention"
+  ],
+  "max_position_embeddings": 40960,
+  "max_window_layers": 40,
+  "model_type": "qwen3",
+  "num_attention_heads": 40,
+  "num_hidden_layers": 40,
+  "num_key_value_heads": 8,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000,
+  "sliding_window": null,
+  "tie_word_embeddings": false,
+  "transformers_version": "4.57.1",
+  "use_cache": false,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+***** train metrics *****
+  epoch                    =        3.0
+  num_input_tokens_seen    =      32104
+  total_flos               =  2515568GF
+  train_loss               =     3.1183
+  train_runtime            = 0:00:40.92
+  train_samples_per_second =     17.152
+  train_steps_per_second   =      2.199
+Figure saved at: saves/Custom/lora/train_2025-11-09-04-47-30/training_loss.png
+[WARNING|2025-11-09 04:49:23] llamafactory.extras.ploting:148 >> No metric eval_loss to plot.
+[WARNING|2025-11-09 04:49:23] llamafactory.extras.ploting:148 >> No metric eval_accuracy to plot.
+
+[INFO|modelcard.py:456] 2025-11-09 04:49:23,051 >> Dropping the following result as it does not have all the necessary fields:
+{'task': {'name': 'Causal Language Modeling', 'type': 'text-generation'}}

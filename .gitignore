@@ -45,3 +45,4 @@ data/**/*.html
 data/**/*.json
 
 train/LLaMA-Factory/data/*.json
+saves/

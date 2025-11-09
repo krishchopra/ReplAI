@@ -1,0 +1,6 @@
+cache_dir: null
+hub_name: huggingface
+lang: en
+last_model: Custom
+path_dict:
+  Custom: NousResearch/Hermes-4-14B

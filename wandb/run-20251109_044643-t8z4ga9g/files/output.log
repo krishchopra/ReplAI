@@ -1,0 +1,169 @@
+100%|██████████████████████████████████████| 3/3 [00:20<00:00,  7.06s/it][INFO|trainer.py:4309] 2025-11-09 04:47:05,727 >> Saving model checkpoint to saves/Custom/lora/train_2025-11-09-04-45-28/checkpoint-3
+Unsloth: Will smartly offload gradients to save VRAM!
+[INFO|configuration_utils.py:765] 2025-11-09 04:47:05,800 >> loading configuration file config.json from cache at /data/stephenx/huggingface/hub/models--NousResearch--Hermes-4-14B/snapshots/950b468d52a607d0b9b7a91b8f4a6a5ad5132dda/config.json
+[INFO|configuration_utils.py:839] 2025-11-09 04:47:05,801 >> Model config Qwen3Config {
+  "architectures": [
+    "Qwen3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "dtype": "bfloat16",
+  "eos_token_id": 151645,
+  "head_dim": 128,
+  "hidden_act": "silu",
+  "hidden_size": 5120,
+  "initializer_range": 0.02,
+  "intermediate_size": 17408,
+  "layer_types": [
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention"
+  ],
+  "max_position_embeddings": 40960,
+  "max_window_layers": 40,
+  "model_type": "qwen3",
+  "num_attention_heads": 40,
+  "num_hidden_layers": 40,
+  "num_key_value_heads": 8,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000,
+  "sliding_window": null,
+  "tie_word_embeddings": false,
+  "transformers_version": "4.57.1",
+  "use_cache": false,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|<string>:466] 2025-11-09 04:47:06,363 >>
+
+Training completed. Do not forget to share your model on huggingface.co/models =)
+
+
+100%|██████████████████████████████████████| 3/3 [00:21<00:00,  7.17s/it]
+{'train_runtime': 22.587, 'train_samples_per_second': 31.08, 'train_steps_per_second': 0.133, 'train_loss': 5.542060216267903, 'epoch': 3.0, 'num_input_tokens_seen': 106240}
+[INFO|trainer.py:4309] 2025-11-09 04:47:06,369 >> Saving model checkpoint to saves/Custom/lora/train_2025-11-09-04-45-28
+[INFO|configuration_utils.py:765] 2025-11-09 04:47:06,448 >> loading configuration file config.json from cache at /data/stephenx/huggingface/hub/models--NousResearch--Hermes-4-14B/snapshots/950b468d52a607d0b9b7a91b8f4a6a5ad5132dda/config.json
+[INFO|configuration_utils.py:839] 2025-11-09 04:47:06,449 >> Model config Qwen3Config {
+  "architectures": [
+    "Qwen3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "dtype": "bfloat16",
+  "eos_token_id": 151645,
+  "head_dim": 128,
+  "hidden_act": "silu",
+  "hidden_size": 5120,
+  "initializer_range": 0.02,
+  "intermediate_size": 17408,
+  "layer_types": [
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention",
+    "full_attention"
+  ],
+  "max_position_embeddings": 40960,
+  "max_window_layers": 40,
+  "model_type": "qwen3",
+  "num_attention_heads": 40,
+  "num_hidden_layers": 40,
+  "num_key_value_heads": 8,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000,
+  "sliding_window": null,
+  "tie_word_embeddings": false,
+  "transformers_version": "4.57.1",
+  "use_cache": false,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+***** train metrics *****
+  epoch                    =        3.0
+  num_input_tokens_seen    =     106240
+  total_flos               =  8324633GF
+  train_loss               =     5.5421
+  train_runtime            = 0:00:22.58
+  train_samples_per_second =      31.08
+  train_steps_per_second   =      0.133
+[WARNING|2025-11-09 04:47:06] llamafactory.extras.ploting:148 >> No metric loss to plot.
+[WARNING|2025-11-09 04:47:06] llamafactory.extras.ploting:148 >> No metric eval_loss to plot.
+[WARNING|2025-11-09 04:47:06] llamafactory.extras.ploting:148 >> No metric eval_accuracy to plot.
+
+[INFO|modelcard.py:456] 2025-11-09 04:47:06,692 >> Dropping the following result as it does not have all the necessary fields:
+{'task': {'name': 'Causal Language Modeling', 'type': 'text-generation'}}

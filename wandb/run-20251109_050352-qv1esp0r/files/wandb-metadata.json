@@ -1,0 +1,159 @@
+{
+  "os":  "Linux-6.8.0-1035-oracle-x86_64-with-glibc2.35",
+  "python":  "CPython 3.10.19",
+  "startedAt":  "2025-11-09T05:03:52.937509Z",
+  "args":  [
+    "--stage",
+    "sft",
+    "--do_train",
+    "True",
+    "--model_name_or_path",
+    "NousResearch/Hermes-4-14B",
+    "--preprocessing_num_workers",
+    "16",
+    "--finetuning_type",
+    "lora",
+    "--template",
+    "qwen3",
+    "--flash_attn",
+    "auto",
+    "--use_unsloth",
+    "True",
+    "--dataset_dir",
+    "train/LLaMA-Factory/data",
+    "--dataset",
+    "replai_fixed",
+    "--cutoff_len",
+    "8192",
+    "--learning_rate",
+    "5e-05",
+    "--num_train_epochs",
+    "3.0",
+    "--per_device_train_batch_size",
+    "2",
+    "--gradient_accumulation_steps",
+    "4",
+    "--lr_scheduler_type",
+    "cosine",
+    "--max_grad_norm",
+    "1.0",
+    "--logging_steps",
+    "10",
+    "--save_steps",
+    "200",
+    "--warmup_steps",
+    "20",
+    "--packing",
+    "False",
+    "--enable_thinking",
+    "False",
+    "--report_to",
+    "wandb",
+    "--output_dir",
+    "saves/Custom/lora/train_2025-11-09-05-02-36",
+    "--bf16",
+    "True",
+    "--plot_loss",
+    "True",
+    "--trust_remote_code",
+    "True",
+    "--ddp_timeout",
+    "180000000",
+    "--include_num_input_tokens_seen",
+    "True",
+    "--optim",
+    "adamw_torch",
+    "--lora_rank",
+    "8",
+    "--lora_alpha",
+    "16",
+    "--lora_dropout",
+    "0",
+    "--lora_target",
+    "all"
+  ],
+  "program":  "/data/stephenx/code/experiment/train/LLaMA-Factory/src/llamafactory/launcher.py",
+  "codePath":  "train/LLaMA-Factory/src/llamafactory/launcher.py",
+  "codePathLocal":  "train/LLaMA-Factory/src/llamafactory/launcher.py",
+  "git":  {
+    "remote":  "https://github.com/krishchopra/ReplAI.git",
+    "commit":  "e04a68f619fe392cba544cccbf6807ef2746b108"
+  },
+  "email":  "xiepin225@gmail.com",
+  "root":  "/data/stephenx/code/experiment",
+  "host":  "brev-b2ljoez99",
+  "executable":  "/data/stephenx/conda_envs/lf/bin/python3.10",
+  "cpu_count":  128,
+  "cpu_count_logical":  255,
+  "gpu":  "NVIDIA A100-SXM4-80GB",
+  "gpu_count":  8,
+  "disk":  {
+    "/":  {
+      "total":  "207929917440",
+      "used":  "202616434688"
+    }
+  },
+  "memory":  {
+    "total":  "2164222636032"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-19decc17-946a-3d50-f331-4dacb6773f08"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-39f134cf-87c2-0387-a7f5-f498f0c2b1be"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-d93329a2-4b31-8d7a-9dbe-2bdffadcd259"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-a40af34f-ea6a-0c4e-5f46-e91a643a815f"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-7ad44e66-6766-1f22-63a4-0ceff9dd9142"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-05887cf1-d246-701a-c600-f33bc39ef80b"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-d8f969a3-2ea3-6111-9734-01acd5eb2e4b"
+    },
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-61369e09-344a-e7ec-3b64-f7de3570215e"
+    }
+  ],
+  "cudaVersion":  "13.0",
+  "writerId":  "ubmd7vvsdarolvitj8v81w618t16shxa"
+}
