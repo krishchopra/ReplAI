@@ -161,11 +161,11 @@ def parse_all_messages(
     root_path = Path(root_dir)
     conversations = []
 
-    # Find all message.json files
-    message_files = list(root_path.glob("**/message.json"))
+    # Find all message*.json files (Instagram exports use message_1.json, message_2.json, etc.)
+    message_files = list(root_path.glob("**/message*.json"))
 
     if not message_files:
-        print(f"No message.json files found in {root_dir}")
+        print(f"No message*.json files found in {root_dir}")
         return []
 
     print(f"Found {len(message_files)} message file(s)")

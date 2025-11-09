@@ -6,6 +6,8 @@
     "send": "tsx test_message.ts",
     "agent": "tsx agent.ts",
     "agent-v2": "tsx agent_v2.ts",
+    "agent-v3": "tsx agent_v3.ts",
+    "agent-v4": "tsx agent_v4.ts",
     "test-reaction": "tsx test_reaction.ts"
   },
   "dependencies": {
