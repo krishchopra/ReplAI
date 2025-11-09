@@ -1,6 +1,7 @@
 import BeeperDesktop from "@beeper/desktop-api";
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import { fetchMemoryBundle, formatMemoryForPrompt } from "./memoryClient";
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ interface ConversationState {
   chatId: string;
   lastSeenSortKey: number;
   conversationHistory: { role: "user" | "assistant"; content: string }[];
+  participants: Set<string>;
 }
 
 async function findTargetChat(client: BeeperDesktop): Promise<string | null> {
@@ -190,7 +192,12 @@ async function runAgent() {
     chatId,
     lastSeenSortKey: startingSortKey,
     conversationHistory: [],
+    participants: new Set<string>(),
   };
+
+  if (TARGET_PHONE) {
+    state.participants.add(TARGET_PHONE);
+  }
 
   // Main loop
   let isGenerating = false;
@@ -232,6 +239,10 @@ async function runAgent() {
             content: msg.text || "",
           });
 
+          if (msg.senderName) {
+            state.participants.add(msg.senderName);
+          }
+
           // Keep conversation history manageable (last 10 exchanges)
           if (state.conversationHistory.length > 20) {
             state.conversationHistory = state.conversationHistory.slice(-20);
@@ -243,6 +254,23 @@ async function runAgent() {
         console.log(
           `💭 Context: ${state.conversationHistory.length} messages in history`
         );
+
+        const participants = Array.from(state.participants);
+        let memoryContext: string | undefined;
+        try {
+          const memoryBundle = await fetchMemoryBundle(
+            state.conversationHistory,
+            participants
+          );
+          if (memoryBundle) {
+            memoryContext = formatMemoryForPrompt(memoryBundle);
+            console.log("🧠 Memory summary prepared");
+          }
+        } catch (err) {
+          console.warn(
+            `⚠️ Failed to fetch long-term memory: ${(err as Error).message}`
+          );
+        }
 
         // Generate and send response
         isGenerating = true;
