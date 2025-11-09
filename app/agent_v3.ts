@@ -188,14 +188,14 @@ async function retrieveMemory(
     let memoryContext =
       "\n\n=== RELEVANT PAST CONVERSATIONS (CRITICAL CONTEXT) ===\n";
     memoryContext +=
-      "IMPORTANT: The following are ACTUAL past conversations by Krish on similar topics.\n";
+      "IMPORTANT: The following are ACTUAL past conversations by Stephen on similar topics.\n";
     memoryContext +=
       "You MUST base your response heavily on these examples. Match the:\n";
-    memoryContext += "- Exact phrasing and word choice Krish used\n";
-    memoryContext += "- Topics and references Krish mentioned\n";
+    memoryContext += "- Exact phrasing and word choice Stephen used\n";
+    memoryContext += "- Topics and references Stephen mentioned\n";
     memoryContext += "- Response length and message breaking patterns\n";
     memoryContext +=
-      "- Specific slang, abbreviations, and expressions Krish used\n";
+      "- Specific slang, abbreviations, and expressions Stephen used\n";
     memoryContext +=
       "- Overall vibe and energy level shown in these conversations\n\n";
     memoryContext +=
@@ -219,7 +219,7 @@ async function retrieveMemory(
         memoryContext += "Conversation:\n";
         for (const msg of result.context_messages.slice(0, 10)) {
           const role =
-            msg.role === "assistant" ? "Krish" : msg.author || "User";
+            msg.role === "assistant" ? "Stephen" : msg.author || "User";
           const content = msg.content || "";
           // Truncate long messages
           const truncated =
@@ -232,7 +232,7 @@ async function retrieveMemory(
 
     memoryContext += "=== END OF RETRIEVED MEMORIES ===\n";
     memoryContext +=
-      "REMEMBER: Mimic Krish's style from these examples as closely as possible.\n";
+      "REMEMBER: Mimic Stephen's style from these examples as closely as possible.\n";
     return memoryContext;
   } catch (error) {
     console.error("⚠️  Memory retrieval failed:");

@@ -5,10 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "dash>=2.16.0",
     "datasets>=4.4.1",
     "networkx>=3.3",
     "numpy>=1.26.0",
+    "plotly>=5.20.0",
+    "pandas>=2.2.0",
     "pydantic>=2.7.0",
+    "scikit-learn>=1.4.0",
     "sentence-transformers>=3.0.0",
     "pytz>=2024.1",
     "neo4j>=5.23.0",

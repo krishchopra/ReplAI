@@ -1,138 +1,249 @@
-import dspy
-import os
-import sys
-from dotenv import load_dotenv
-from datasets import load_dataset
+#!/usr/bin/env python
+"""Optimize a prompt so a model mimics the user's tone in replai.json using DSPy GEPA."""
 
+from __future__ import annotations
 
-load_dotenv()
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-ENDPOINT_URL = os.environ.get("ENDPOINT_URL")
-
-# Configuration for the model
-HUGGINGFACE_MODEL_NAME = "NousResearch/Hermes-4-14B"
-
-# Configure DSPy LM for text generation
-lm = dspy.LM(f"openai/{HUGGINGFACE_MODEL_NAME}",
-             api_base=os.environ.get("ENDPOINT_URL"),
-             api_key="local", 
-             model_type="chat")
-dspy.configure(lm=lm)
-
-
-def load_train_set(dataset_path="/data/training-data/replai.json", num_examples=100):
-    """Load training data from HuggingFace dataset."""
-    print(f"Loading {num_examples} examples")
-    dataset = load_dataset("json", dataset_path).select(range(num_examples))
-    
-    train_examples = []
-    for example in dataset:
-        train_examples.append(
-            messages = example["messages"]
-            
-        )
-    return train_examples
-
-
-class GenerateText(dspy.Signature):
-    """Generate text based on given instructions."""
-    prompts = dspy.InputField(desc="Task instructions for text generation")
-    generated_text = dspy.OutputField(desc="Generated text following the instructions")
-
-
-class AIDetection(dspy.Signature):
-    """Detect whether a text is AI-generated or human-written."""
-    text = dspy.InputField(desc="Text to analyze")
-    ai_probability = dspy.OutputField(desc="Probability (0-100) that this text is AI-generated, where 0 is definitely human and 100 is definitely AI")
-
-class HumanTextGenerator(dspy.Module):
-    """Module to generate human-like text based on instructions."""
-    
-    def __init__(self):
-        super().__init__()
-        self.generate = dspy.Predict(GenerateText)
-    
-    def forward(self, prompts):
-        result = self.generate(prompts=prompts)
-        return dspy.Prediction(generated_text=result.generated_text)
-import re
+import argparse
+import json
 import math
-def extract_probability(result):
-    """Helper to extract probability from detector result."""
-    try:
-        return float(result.ai_probability)
-    except (ValueError, AttributeError):
-        match = re.search(r'\d+\.?\d*', str(result.ai_probability))
-        return float(match.group()) if match else 50.0
-        
-def gepa_answer_metric(gold, pred, trace=None, pred_name=None, pred_trace=None):
-    generated_text = pred.generated_text
-    with dspy.context(lm=detector_lm):
-        ai_detector = dspy.Predict(AIDetection)
-        generated_detection_result = ai_detector(text=generated_text)
-        generated_ai_prob = extract_probability(generated_detection_result)
-    generated_ai_prob = max(0, min(100, generated_ai_prob)) / 100
-    temperature = 0.5
-    raw_score = 1.0 - generated_ai_prob
-    logit = math.log(raw_score + 1e-8) - math.log(1 - raw_score + 1e-8)
-    scaled_logit = logit / temperature
-    score = 1.0 / (1.0 + math.exp(-scaled_logit))
-    return score
- 
-if __name__ == "__main__":
-    # Check server configuration
-    print(f"Endpoint URL: {ENDPOINT_URL}")
-    print(f"Model: {HUGGINGFACE_MODEL_NAME}")
-    
-    # Load training data
-    print("\nLoading training data...")
-    trainset = load_train_set(num_examples=50)  # Start with smaller set for faster iteration
-    print(f"Loaded {len(trainset)} training examples")
-    
-    # Create the text generator module
-    print("\nInitializing HumanTextGenerator module...")
-    text_generator = HumanTextGenerator()
-    
-    # Test the module on first example
-    print("\nTesting module on first example...")
-    first_example = trainset[0]
-    print(f"Prompts: {first_example.prompts[:100]}...")
-    result = text_generator(prompts=first_example.prompts)
-    print(f"Generated: {result.generated_text[:200]}...")
-    
-    # Create reflection LM for GEPA (same as detector_lm)
-    print("\nSetting up GEPA optimizer...")
-    print("Using Claude Sonnet 4.5 for AI detection and reflection...")
-    reflection_lm = dspy.LM(
-        "anthropic/claude-sonnet-4-5-20250929",
-        api_key=ANTHROPIC_API_KEY,
-        temperature=1.0,
-        thinking={
-            "type": "enabled",
-            "budget_tokens": 10000
-        },
-        max_tokens=32000,
+import os
+import random
+import re
+from pathlib import Path
+from typing import Iterable, List
+
+import dspy
+from dotenv import load_dotenv
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Optimize a ReplAI-style prompt with GEPA using the replai.json dataset.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    
-    # Run GEPA optimization
-    print("\nStarting GEPA optimization...")
-    print("This will optimize the prompts to generate text that appears human-written...")
-    print("Metric: AI detection model judges whether text appears AI-generated or human-written")
+    parser.add_argument(
+        "--data-path",
+        default="data/training-data/replai.json",
+        help="Path to the JSON conversation file that contains the user's chat history.",
+    )
+    parser.add_argument(
+        "--num-examples",
+        type=int,
+        default=200,
+        help="Number of assistant turns to use when fitting GEPA (after filtering).",
+    )
+    parser.add_argument(
+        "--max-context-turns",
+        type=int,
+        default=6,
+        help="Maximum number of recent turns to feed into each training example.",
+    )
+    parser.add_argument(
+        "--output",
+        default="train/gepa/optimized_replai_prompt.json",
+        help="Where to save the optimized DSPy module.",
+    )
+    parser.add_argument(
+        "--generator-model",
+        default=os.getenv("REPLAI_GENERATOR_MODEL", "NousResearch/Hermes-4-14B"),
+        help="Model ID served by your inference endpoint for generation.",
+    )
+    parser.add_argument(
+        "--endpoint-url",
+        default=os.getenv("ENDPOINT_URL"),
+        help="Inference endpoint URL that serves the generator model.",
+    )
+    parser.add_argument(
+        "--generator-api-key",
+        default=os.getenv("REPLAI_GENERATOR_API_KEY", os.getenv("OPENAI_API_KEY", "local")),
+        help="API key expected by the inference endpoint.",
+    )
+    parser.add_argument(
+        "--judge-model",
+        default=os.getenv("REPLAI_JUDGE_MODEL", "anthropic/claude-sonnet-4-5-20250929"),
+        help="LM used for the style-matching metric and GEPA reflection.",
+    )
+    parser.add_argument(
+        "--anthropic-api-key",
+        default=os.getenv("ANTHROPIC_API_KEY"),
+        help="API key for the Anthropic judge/reflection model.",
+    )
+    parser.add_argument(
+        "--auto",
+        choices=["light", "medium", "heavy"],
+        default="medium",
+        help="GEPA auto setting that trades off speed vs. search depth.",
+    )
+    parser.add_argument(
+        "--num-threads",
+        type=int,
+        default=4,
+        help="Parallel GEPA workers.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=13,
+        help="Random seed for deterministic sampling.",
+    )
+    return parser.parse_args()
+
+
+def format_turn(role: str, content: str) -> str:
+    speaker = "Me" if role == "assistant" else "Them"
+    return f"{speaker}: {content.strip()}"
+
+
+def iter_assistant_examples(
+    raw_conversations: Iterable[dict],
+    max_context_turns: int,
+) -> Iterable[dspy.Example]:
+    for conversation in raw_conversations:
+        messages = conversation.get("messages") or conversation.get("openai_messages") or []
+        if not isinstance(messages, list):
+            continue
+        for idx, turn in enumerate(messages):
+            if turn.get("role") != "assistant":
+                continue
+            history = messages[max(0, idx - max_context_turns): idx]
+            if not history:
+                continue
+            reference = turn.get("content", "").strip()
+            if len(reference) < 2:
+                continue
+            context = "\n".join(format_turn(m["role"], m.get("content", "")) for m in history)
+            yield dspy.Example(
+                context=context,
+                reference_response=reference,
+            ).with_inputs("context")
+
+
+def load_trainset(data_path: Path, num_examples: int, max_context_turns: int) -> List[dspy.Example]:
+    if not data_path.exists():
+        raise FileNotFoundError(f"Conversation file not found: {data_path}")
+    with data_path.open("r", encoding="utf-8") as fh:
+        raw_data = json.load(fh)
+    examples = list(iter_assistant_examples(raw_data, max_context_turns))
+    if not examples:
+        raise ValueError("No usable assistant turns were found in the dataset.")
+    random.shuffle(examples)
+    subset = examples[:num_examples]
+    print(f"Loaded {len(subset)} examples (from {len(examples)} available) for GEPA.")
+    return subset
+
+
+class ReplAIResponse(dspy.Signature):
+    """Signature for predicting the next message from the user's perspective."""
+
+    context = dspy.InputField(desc="Recent conversation turns, alternating between Them and Me")
+    response = dspy.OutputField(desc="The next short reply I would send, matching my tone and slang")
+
+
+class StyleJudge(dspy.Signature):
+    """Judge that compares a candidate reply with the real user reply."""
+
+    context = dspy.InputField(desc="Conversation context to ground the decision")
+    candidate_response = dspy.InputField(desc="Model response produced with the current prompt")
+    reference_response = dspy.InputField(desc="Authentic response written by the user")
+    style_score = dspy.OutputField(
+        desc="Float between 0 and 1 indicating how well the candidate matches the user's style",
+    )
+
+
+class ReplAIBehaviorGenerator(dspy.Module):
+    """Thin wrapper around the LM so GEPA can rewrite its prompt."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.generate = dspy.Predict(ReplAIResponse)
+
+    def forward(self, context: str) -> dspy.Prediction:
+        result = self.generate(context=context)
+        return dspy.Prediction(response=result.response)
+
+
+def clamp(value: float, low: float = 0.0, high: float = 1.0) -> float:
+    return max(low, min(high, value))
+
+
+def parse_score(raw_value) -> float:
+    if raw_value is None:
+        return 0.0
+    if isinstance(raw_value, (int, float)):
+        return float(raw_value)
+    match = re.search(r"(\d+(\.\d+)?)", str(raw_value))
+    return float(match.group(1)) if match else 0.0
+
+
+def make_style_metric(judge_lm: dspy.LM):
+    def metric(gold, pred, trace=None, pred_name=None, pred_trace=None) -> float:
+        candidate = (pred.response or "").strip()
+        if not candidate:
+            return 0.0
+        with dspy.context(lm=judge_lm):
+            judge = dspy.Predict(StyleJudge)
+            result = judge(
+                context=gold.context,
+                candidate_response=candidate,
+                reference_response=gold.reference_response,
+            )
+        score = parse_score(result.style_score)
+        if score < 0:
+            score = 0.0
+        if score > 1:
+            score = score / 100 if score <= 100 else 1 / (1 + math.exp(-score))
+        return clamp(score)
+
+    return metric
+
+
+def configure_generator_lm(model_id: str, endpoint_url: str | None, api_key: str) -> None:
+    if not endpoint_url:
+        raise ValueError("An inference ENDPOINT_URL must be provided via flag or environment.")
+    lm = dspy.LM(
+        f"openai/{model_id}",
+        api_base=endpoint_url,
+        api_key=api_key,
+        model_type="chat",
+        temperature=0.7,  # Increase from 0.3 to reduce repetition
+        max_tokens=256,   # Reduce from 16384 - chat replies should be SHORT!
+    )
+    dspy.configure(lm=lm)
+
+
+def build_anthropic_lm(model_id: str, api_key: str | None) -> dspy.LM:
+    if not api_key:
+        raise ValueError("ANTHROPIC_API_KEY is required to run the judge/reflection models.")
+    return dspy.LM(
+        model_id,
+        api_key=api_key,
+        temperature=0.3,
+        max_tokens=8096,
+    )
+
+
+def main() -> None:
+    load_dotenv()
+    args = parse_args()
+    random.seed(args.seed)
+
+    configure_generator_lm(args.generator_model, args.endpoint_url, args.generator_api_key)
+    judge_lm = build_anthropic_lm(args.judge_model, args.anthropic_api_key)
+
+    trainset = load_trainset(Path(args.data_path), args.num_examples, args.max_context_turns)
+    module = ReplAIBehaviorGenerator()
+
+    print("Launching GEPA to optimize the user-behavior prompt...")
     tp = dspy.GEPA(
-        metric=answer_metric,
-        auto="medium",
-        num_threads=4,  # Reduced for stability
-        reflection_lm=reflection_lm,
+        metric=make_style_metric(judge_lm),
+        auto=args.auto,
+        num_threads=args.num_threads,
+        reflection_lm=judge_lm,
     )
-    
-    optimized_generator = tp.compile(text_generator, trainset=trainset)
-    
-    # Save the optimized program
-    output_path = "/home/stephenx/code/ghostwriter/optimized_human_text_generator.json"
-    optimized_generator.save(output_path)
-    print(f"\nOptimized generator saved to {output_path}")
-    
-    # Test optimized version
-    print("\nTesting optimized module...")
-    result_optimized = optimized_generator(prompts=first_example.prompts)
-    print(f"Optimized generated: {result_optimized.generated_text[:200]}...")
+    optimized_module = tp.compile(module, trainset=trainset)
+    optimized_module.save(args.output)
+    print(f"Optimized module saved to {args.output}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,28 @@
+{
+  "generate": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "Generate the next message from \"Me\" (the user's perspective) in a casual text conversation.\n\n## Task Description\nYou are given a conversation context between \"Me\" (the user) and \"Them\" (another person). Your task is to predict what \"Me\" would say next in response to \"Them's\" last message.\n\n## Key Requirements\n1. **Be extremely concise**: Text messages should be very brief - often just 2-5 words. Single words, short phrases, or simple acknowledgments are often most appropriate.\n\n2. **Match the conversation tone**: Pay close attention to the casual, informal tone. Use appropriate slang, abbreviations, and emoji sparingly when they fit naturally.\n\n3. **Stay contextually relevant**: Your response should directly relate to what \"Them\" just said. Don't introduce elaborate commentary or try to be clever.\n\n4. **Prioritize simplicity**: The most natural responses are often the simplest ones. Don't overthink it.\n\n5. **Avoid these common mistakes**:\n   - Don't write multiple sentences when the conversation doesn't call for it\n   - Don't try to be witty or make jokes unless it flows extremely naturally\n   - Don't add unnecessary commentary or observations\n   - Don't force personality or humor into the response\n   - Don't use multiple emojis or overuse them\n   - Don't ask follow-up questions that feel forced\n\n6. **Understand conversation flow**: Sometimes the best response is:\n   - A simple acknowledgment (\"yeah\", \"lol\", \"oof\", \"rip\", \"ok\", \"cool\", \"nice\")\n   - A single emoji\n   - A very short phrase (2-4 words)\n   - Minimal engagement when \"Them\" is venting or making a statement that doesn't require elaboration\n\n## What Works Best\n- Short, authentic reactions\n- Simple acknowledgments\n- Minimal elaboration\n- Natural, effortless responses that don't try too hard\n- Responses that feel like how people actually text, not how they write\n\n## Critical Insights from Scoring Patterns\n\n**When someone makes a simple statement or acknowledgment (like \"i like it\" or \"Lovely\"), often the BEST response is NO response or an extremely minimal one.** The examples show:\n\n- \"Yeah for sure\" after being added to a calendar got 0.45 (moderate) - this might have been slightly too elaborate for a simple logistical statement\n- Repeating the same emoji pattern got 0.3 (low-moderate) - repetition without variation can feel unnatural\n- \"thanks\" after \"i like it\" got 0.0 (lowest) - this suggests that when someone gives a vague compliment after you asked them to \"be specific,\" saying \"thanks\" accepts their non-answer too readily. A better response might acknowledge the lack of specificity or just not respond at all.\n\n**Key Pattern**: When the conversation reaches a natural stopping point or when \"Them\" gives a minimal/vague response, sometimes the most authentic choice is to either:\n- Not respond at all (end the exchange)\n- Give an extremely minimal acknowledgment (single word or emoji)\n- Push back gently if they're being evasive (but only if contextually appropriate)\n\nIn Example 3, \"Me\" asked \"Them\" to \"be specific\" but \"Them\" responded with the equally vague \"i like it.\" Saying \"thanks\" ignores that they didn't actually comply with the request. Better options might be: \"lol ok\", \"bruh\", \"😑\", or even no response.\n\nFocus on what a real person would quickly type in response, not what sounds polite or complete when written out.",
+      "fields": [
+        {
+          "prefix": "Context:",
+          "description": "Recent conversation turns, alternating between Them and Me"
+        },
+        {
+          "prefix": "Response:",
+          "description": "The next short reply I would send, matching my tone and slang"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.12",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}

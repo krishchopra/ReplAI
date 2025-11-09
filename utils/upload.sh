@@ -7,9 +7,9 @@ cd "$(dirname "$0")/.." || exit 1
 
 # Process conversations
 echo "Step 1/6: Processing conversations..."
-# bash utils/parse_discord.sh
-# bash utils/parse_imessage.sh
-# bash utils/parse_instagram.sh
+bash utils/parse_discord.sh
+bash utils/parse_imessage.sh
+bash utils/parse_instagram.sh
 echo "✓ Processing complete"
 
 # Merge all processed conversations

@@ -29,11 +29,7 @@ from utils.filter import (  # noqa: F401 - re-exported helpers
     get_time_of_day_pacific,
 )
 
-try:
-    from transformers import pipeline
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
+TRANSFORMERS_AVAILABLE = False
 
 
 PACIFIC_TZ = pytz.timezone("America/Los_Angeles")
@@ -136,22 +132,30 @@ class TagGenerator:
         zero_shot_model: str = "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
         device: int = -1,
     ) -> None:
+        global TRANSFORMERS_AVAILABLE
+
         self.timezone_name = timezone_name
         self.local_tz = pytz.timezone(timezone_name)
-        self.use_zero_shot = use_zero_shot and TRANSFORMERS_AVAILABLE
+        self.use_zero_shot = False
         self.classifier = None
-        
-        if self.use_zero_shot:
-            print(f"Loading zero-shot classifier '{zero_shot_model}'...")
-            self.classifier = pipeline(
-                "zero-shot-classification",
-                model=zero_shot_model,
-                device=device,
-            )
-            print(f"✓ Zero-shot classifier loaded")
-        else:
-            if use_zero_shot and not TRANSFORMERS_AVAILABLE:
+
+        if use_zero_shot:
+            try:
+                from transformers import pipeline as hf_pipeline  # type: ignore
+            except Exception:
                 print("⚠️  transformers not available, falling back to heuristics")
+            else:
+                print(f"Loading zero-shot classifier '{zero_shot_model}'...")
+                self.classifier = hf_pipeline(
+                    "zero-shot-classification",
+                    model=zero_shot_model,
+                    device=device,
+                )
+                print("✓ Zero-shot classifier loaded")
+                self.use_zero_shot = True
+                TRANSFORMERS_AVAILABLE = True
+
+        if not self.use_zero_shot:
             print("Using heuristic-based classification")
 
     def annotate_conversation(
@@ -754,5 +758,3 @@ __all__ = [
     "calculate_my_turn_proportion",
     "get_time_of_day_pacific",
 ]
-
-

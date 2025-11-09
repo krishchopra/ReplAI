@@ -1,1 +1,2 @@
-python utils/download_and_decrypt_dataset.py Stephen-Xie/chat-dataset-gap-2 $(pwd)/train/LLaMA-Factory/data/replai.json --encryption-key "$ENCRYPTION_KEY_1"
+# python utils/download_and_decrypt_dataset.py Stephen-Xie/chat-dataset-gap-2 $(pwd)/train/LLaMA-Factory/data/replai.json --encryption-key "$ENCRYPTION_KEY_1"
+python utils/download_and_decrypt_dataset.py Stephen-Xie/chat-dataset-gap-2 $(pwd)/data/processed/conversations_decrypted.json --encryption-key "$ENCRYPTION_KEY_1"
