@@ -6,9 +6,17 @@ dotenv.config();
 async function sendMessage() {
   // Get access token from environment variable
   const accessToken = process.env["BEEPER_ACCESS_TOKEN"];
+  const targetPhone = process.env["TARGET_PHONE"];
+  const messageText = process.argv[2] || "Test message from Beeper Desktop API";
 
   if (!accessToken) {
     console.error("❌ Error: BEEPER_ACCESS_TOKEN not found in .env file");
+    console.error("See README.md for setup instructions");
+    process.exit(1);
+  }
+
+  if (!targetPhone) {
+    console.error("❌ Error: TARGET_PHONE not found in .env file");
     console.error("See README.md for setup instructions");
     process.exit(1);
   }
@@ -19,11 +27,11 @@ async function sendMessage() {
   });
 
   try {
-    console.log("Searching for Stephen Xie...");
+    console.log(`Searching for ${targetPhone}...`);
 
     // Search for chats with the phone number
     const chatResults = await client.chats.search({
-      query: "+1 510-378-3981",
+      query: targetPhone,
       limit: 10,
       type: "single", // Only get 1:1 chats, not groups
     });
@@ -31,7 +39,7 @@ async function sendMessage() {
     console.log(`Found ${chatResults.items.length} single chats`);
 
     if (chatResults.items.length === 0) {
-      console.error("Could not find a 1:1 chat with Stephen Xie");
+      console.error(`Could not find a 1:1 chat with ${targetPhone}`);
       process.exit(1);
     }
 
@@ -42,10 +50,9 @@ async function sendMessage() {
     // Send the message (URL encode chat ID since it contains special chars)
     console.log("Sending message...");
     const encodedChatId = encodeURIComponent(chat.id);
-    console.log(`Encoded chat ID: ${encodedChatId}`);
     const response = (await client.post(`/v1/chats/${encodedChatId}/messages`, {
       body: {
-        text: "the beeper MCP is working",
+        text: messageText,
       },
     })) as any;
 
