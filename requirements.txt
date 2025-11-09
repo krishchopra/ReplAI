@@ -2,4 +2,6 @@ beautifulsoup4==4.12.3
 types-beautifulsoup4
 cryptography>=41.0.0
 pytz>=2024.1
+datasets>=2.14.0
+huggingface-hub>=0.16.0
 

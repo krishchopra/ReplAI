@@ -17,6 +17,7 @@ import sys
 import base64
 import secrets
 from typing import List, Dict, Any
+from pathlib import Path
 
 
 def generate_encryption_key() -> str:
@@ -28,6 +29,35 @@ def generate_encryption_key() -> str:
     """
     key = secrets.token_bytes(32)  # 256-bit key
     return base64.urlsafe_b64encode(key).decode("utf-8")
+
+
+def append_key_to_env(encryption_key: str) -> None:
+    """
+    Append the encryption key to .env file at project root.
+    
+    Args:
+        encryption_key: The encryption key to append
+    """
+    # Get the project root (parent of utils directory)
+    project_root = Path(__file__).parent.parent
+    env_file = project_root / ".env"
+    
+    # Read existing content
+    existing_lines = []
+    if env_file.exists():
+        existing_lines = env_file.read_text(encoding="utf-8").splitlines()
+    
+    # Filter out any existing ENCRYPTION_KEY lines
+    filtered_lines = [line for line in existing_lines if not line.startswith("ENCRYPTION_KEY=")]
+    
+    # Add the new encryption key
+    filtered_lines.append(f"ENCRYPTION_KEY={encryption_key}")
+    
+    # Write back to file
+    with open(env_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(filtered_lines) + "\n")
+    
+    print(f"✓ Encryption key written to {env_file}", file=sys.stderr)
 
 
 def encrypt_message_data(data: str, encryption_key: str) -> str:
@@ -254,6 +284,7 @@ Examples:
         key = generate_encryption_key()
         print("Generated encryption key (save this securely!):")
         print(key)
+        append_key_to_env(key)
         return
 
     # Validate arguments
@@ -283,6 +314,7 @@ Examples:
             print("=" * 60)
             print("⚠️ You MUST save this key to decrypt your data!")
             print("=" * 60 + "\n")
+            append_key_to_env(encryption_key)
         else:
             parser.error("--encryption-key is required for decryption")
 

@@ -7,9 +7,9 @@ cd "$(dirname "$0")/.." || exit 1
 
 # Process conversations
 echo "Step 1/5: Processing conversations..."
-bash utils/parse_discord.sh
-bash utils/parse_imessage.sh
-bash utils/parse_instagram.sh
+# bash utils/parse_discord.sh
+# bash utils/parse_imessage.sh
+# bash utils/parse_instagram.sh
 echo "✓ Processing complete"
 
 # Merge all processed conversations
@@ -50,9 +50,25 @@ echo "✓ Filter complete"
 
 # Encrypt the data (auto-generates encryption key)
 echo "Step 5/5: Encrypting conversations..."
-python utils/encrypt_conversations.py --encrypt data/merged/all_conversations_partitioned.json -o data/merged/all_conversations_encrypted.json
+python utils/encrypt_conversations.py --encrypt data/merged/all_conversations_partitioned_filtered.json -o data/merged/all_conversations_encrypted.json
+if [ ! -f "data/merged/all_conversations_encrypted.json" ]; then
+    echo "Error: encryption failed - output file not found"
+    exit 1
+fi
+echo "✓ Encryption complete"
 
-# Upload
-# TODO: Add upload step (Hugging Face)
+# Upload to Hugging Face as a dataset
+HF_TOKEN_VALUE=$(env | grep "^HF_TOKEN=" | cut -d= -f2- || echo "")
+if [ -z "$HF_TOKEN_VALUE" ]; then
+    echo "Error: HF_TOKEN environment variable is not set"
+    echo "Please set it with: export HF_TOKEN=your_token_here"
+    exit 1
+fi
+echo "Uploading dataset to Hugging Face..."
+env HF_TOKEN="$HF_TOKEN_VALUE" python utils/upload_dataset.py \
+  data/merged/all_conversations_encrypted.json \
+  --repo-id Stephen-Xie/chat-dataset \
+  --token "$HF_TOKEN_VALUE"
+echo "✓ Upload complete"
 
 echo "All steps completed successfully!"
