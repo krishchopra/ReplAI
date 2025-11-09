@@ -107,7 +107,9 @@ class LLMStyleExtractor:
             )
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key and not dry_run:
-            raise RuntimeError("OPENAI_API_KEY environment variable is required for LLM extraction.")
+            raise RuntimeError(
+                "OPENAI_API_KEY environment variable is required for LLM extraction."
+            )
 
         self.model_name = model_name
         self.temperature = temperature
@@ -115,13 +117,17 @@ class LLMStyleExtractor:
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.dry_run = dry_run
-        self.client = OpenAI(api_key=api_key) if (OpenAI is not None and not dry_run) else None
+        self.client = (
+            OpenAI(api_key=api_key) if (OpenAI is not None and not dry_run) else None
+        )
 
     def _bucket_cache_path(self, bucket_index: int) -> Path:
         """Return the cache file path for a given bucket index."""
         return self.cache_dir / f"bucket_{bucket_index:04d}.json"
 
-    def analyse_bucket(self, bucket_index: int, messages: Sequence[MessageRecord]) -> List[TraitRecord]:
+    def analyse_bucket(
+        self, bucket_index: int, messages: Sequence[MessageRecord]
+    ) -> List[TraitRecord]:
         """Return stylistic traits for a bucket, loading from cache or querying the LLM."""
         cache_path = self._bucket_cache_path(bucket_index)
         if cache_path.exists():
@@ -132,7 +138,11 @@ class LLMStyleExtractor:
             for trait in traits_payload:
                 # Support legacy cache entries that stored a combined text field.
                 if "name" not in trait and "text" in trait:
-                    name, description = trait["text"].split(":", 1) if ":" in trait["text"] else ("Style trait", trait["text"])
+                    name, description = (
+                        trait["text"].split(":", 1)
+                        if ":" in trait["text"]
+                        else ("Style trait", trait["text"])
+                    )
                     cached_records.append(
                         TraitRecord(
                             name=name.strip(),
@@ -175,7 +185,7 @@ class LLMStyleExtractor:
             )
 
         sampled_messages = [
-            f"{i+1}. {msg.content.strip()}" for i, msg in enumerate(messages)
+            f"{i + 1}. {msg.content.strip()}" for i, msg in enumerate(messages)
         ]
         prompt = (
             "Analyse the following text messages that I wrote. "
@@ -183,7 +193,7 @@ class LLMStyleExtractor:
             "Return JSON with schema:\n"
             "{\n"
             '  "traits": [\n'
-            '    {\n'
+            "    {\n"
             '      "name": string,\n'
             '      "description": string,\n'
             '      "markers": [string],\n'
@@ -209,6 +219,16 @@ class LLMStyleExtractor:
             ],
         )
         output_text = response.output_text or ""
+        # Strip markdown code blocks if present
+        output_text = output_text.strip()
+        if output_text.startswith("```json"):
+            output_text = output_text[7:]  # Remove ```json
+        elif output_text.startswith("```"):
+            output_text = output_text[3:]  # Remove ```
+        if output_text.endswith("```"):
+            output_text = output_text[:-3]  # Remove trailing ```
+        output_text = output_text.strip()
+
         try:
             parsed = json.loads(output_text)
         except json.JSONDecodeError as exc:  # pragma: no cover - defensive
@@ -225,7 +245,11 @@ class LLMStyleExtractor:
             if polarity not in {"positive", "negative"}:
                 polarity = "positive"
             markers_raw = trait.get("markers", [])
-            markers = [str(marker) for marker in markers_raw if isinstance(marker, (str, int, float))]
+            markers = [
+                str(marker)
+                for marker in markers_raw
+                if isinstance(marker, (str, int, float))
+            ]
             examples_raw = trait.get("examples", [])
             examples: List[int] = []
             for idx in examples_raw:
@@ -272,10 +296,14 @@ class Embedder:
 
         if provider == "openai":
             if OpenAI is None:
-                raise RuntimeError("openai package is required for embedding provider 'openai'.")
+                raise RuntimeError(
+                    "openai package is required for embedding provider 'openai'."
+                )
             api_key = os.environ.get("OPENAI_API_KEY")
             if not api_key:
-                raise RuntimeError("OPENAI_API_KEY environment variable is required for OpenAI embeddings.")
+                raise RuntimeError(
+                    "OPENAI_API_KEY environment variable is required for OpenAI embeddings."
+                )
             self.client = OpenAI(api_key=api_key)
         elif provider == "sentence-transformers":
             if SentenceTransformer is None:
@@ -294,7 +322,9 @@ class Embedder:
         if self.provider == "openai":
             vectors: List[np.ndarray] = []
             for batch in batched(texts, self.batch_size):
-                response = self.client.embeddings.create(model=self.model_name, input=list(batch))
+                response = self.client.embeddings.create(
+                    model=self.model_name, input=list(batch)
+                )
                 for item in response.data:
                     vectors.append(np.asarray(item.embedding, dtype=np.float32))
             array = np.vstack(vectors)
@@ -326,7 +356,9 @@ def load_conversations(path: Path) -> List[Dict[str, Any]]:
         return json.load(handle)
 
 
-def flatten_assistant_messages(conversations: List[Dict[str, Any]]) -> List[MessageRecord]:
+def flatten_assistant_messages(
+    conversations: List[Dict[str, Any]],
+) -> List[MessageRecord]:
     """Collect assistant messages across conversations as MessageRecord instances."""
     flattened: List[MessageRecord] = []
     for conv_idx, conv in enumerate(conversations):
@@ -447,8 +479,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Extract stylistic traits and keep the most stylistically aligned messages."
     )
-    parser.add_argument("input_file", type=str, help="Path to filtered conversations JSON.")
-    parser.add_argument("output_file", type=str, help="Path to write stylistically filtered snippets.")
+    parser.add_argument(
+        "input_file", type=str, help="Path to filtered conversations JSON."
+    )
+    parser.add_argument(
+        "output_file", type=str, help="Path to write stylistically filtered snippets."
+    )
     parser.add_argument(
         "--cache-dir",
         type=str,
@@ -564,17 +600,23 @@ def main() -> None:
         bucket_traits.extend(traits)
 
     if not bucket_traits:
-        raise RuntimeError("No stylistic traits were extracted; check LLM configuration.")
+        raise RuntimeError(
+            "No stylistic traits were extracted; check LLM configuration."
+        )
 
     embedder = Embedder(
         provider=args.embedding_provider,
         model_name=args.embedding_model,
     )
 
-    trait_embeddings = embedder.embed([trait.embedding_text() for trait in bucket_traits])
+    trait_embeddings = embedder.embed(
+        [trait.embedding_text() for trait in bucket_traits]
+    )
     trait_weights = np.array(
         [
-            trait.confidence if trait.polarity == "positive" else -0.5 * trait.confidence
+            trait.confidence
+            if trait.polarity == "positive"
+            else -0.5 * trait.confidence
             for trait in bucket_traits
         ],
         dtype=np.float32,
@@ -635,5 +677,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

@@ -44,6 +44,8 @@ inbox/
 data/**/*.html
 data/**/*.json
 data/**/instagram/*
+data/**/style_cache/*
+data/merged/*
 
 train/LLaMA-Factory/data/*.json
 saves/
