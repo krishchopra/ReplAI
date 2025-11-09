@@ -1,8 +1,12 @@
 import BeeperDesktop from "@beeper/desktop-api";
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import { exec } from "child_process";
+import { promisify } from "util";
 
 dotenv.config();
+
+const execAsync = promisify(exec);
 
 // Configuration
 const POLL_INTERVAL_MS = 2000; // Check every 2 seconds
@@ -110,16 +114,78 @@ async function getNewMessages(
   return filtered;
 }
 
+async function retrieveMemory(query: string, limit: number = 2): Promise<string> {
+  try {
+    const { stdout } = await execAsync(
+      `python retrieve_conversations.py "${query.replace(/"/g, '\\"')}" --json --limit ${limit} 2>/dev/null`
+    );
+    
+    const results = JSON.parse(stdout);
+    
+    if (!results || results.length === 0) {
+      return "";
+    }
+    
+    // Format retrieved memories for the prompt
+    let memoryContext = "\n\n=== RELEVANT PAST CONVERSATIONS ===\n";
+    memoryContext += "Take these past conversations of 'StephenX' into account when generating your response.\n\n";
+    
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      const tags = result.tags ? result.tags.join(", ") : "";
+      
+      memoryContext += `--- Memory ${i + 1} (similarity: ${result.score?.toFixed(3)}) ---\n`;
+      if (tags) {
+        memoryContext += `Tags: ${tags}\n`;
+      }
+      
+      // Add context messages
+      if (result.context_messages && result.context_messages.length > 0) {
+        memoryContext += "Conversation:\n";
+        for (const msg of result.context_messages.slice(0, 8)) {
+          const role = msg.role === "assistant" ? "StephenX" : msg.author || "User";
+          const content = msg.content || "";
+          // Truncate long messages
+          const truncated = content.length > 200 ? content.substring(0, 200) + "..." : content;
+          memoryContext += `  ${role}: ${truncated}\n`;
+        }
+      }
+      memoryContext += "\n";
+    }
+    
+    memoryContext += "=== END OF RETRIEVED MEMORIES ===\n";
+    return memoryContext;
+  } catch (error) {
+    console.error("⚠️  Memory retrieval failed:", error instanceof Error ? error.message : error);
+    return "";
+  }
+}
+
 async function generateResponse(
   openai: OpenAI,
   conversationHistory: { role: "user" | "assistant"; content: string }[],
   abortSignal?: AbortSignal
 ): Promise<string> {
+  // Get the latest user message for memory retrieval
+  const lastUserMessage = conversationHistory
+    .filter((msg) => msg.role === "user")
+    .slice(-1)[0];
+  
+  let systemPrompt = SYSTEM_PROMPT;
+  
+  // Retrieve relevant memories if we have a user message
+  if (lastUserMessage && lastUserMessage.content) {
+    const memoryContext = await retrieveMemory(lastUserMessage.content, 2);
+    if (memoryContext) {
+      systemPrompt += memoryContext;
+    }
+  }
+  
   const completion = await openai.chat.completions.create(
     {
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         ...conversationHistory,
       ],
       temperature: 0.8,
@@ -185,6 +251,7 @@ async function processResponseQueue(
 
   console.log(`\n🔄 Processing response for ${state.contactName}...`);
   console.log(`💭 Context: ${state.conversationHistory.length} messages`);
+  console.log(`Retrieving relevant memories from GraphRAG...`);
 
   state.isGenerating = true;
   state.abortController = new AbortController();

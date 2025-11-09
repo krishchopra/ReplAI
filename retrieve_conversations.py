@@ -19,11 +19,15 @@ class ConversationRetriever:
         neo4j_user: str = "neo4j",
         neo4j_password: str = "password123",
         embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
+        quiet: bool = False,
     ):
         self.driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
-        print(f"Loading embedding model '{embedding_model}'...")
+        self.quiet = quiet
+        if not quiet:
+            print(f"Loading embedding model '{embedding_model}'...")
         self.embedder = SentenceTransformer(embedding_model)
-        print("✓ Retriever initialized")
+        if not quiet:
+            print("✓ Retriever initialized")
     
     def close(self):
         self.driver.close()
@@ -153,6 +157,7 @@ class ConversationRetriever:
         show_context: bool = True,
     ):
         """Search and display results in a readable format"""
+        print(f"\nSearching for: '{query}'")
         results = self.vector_search(query, limit=limit, tags=tags)
         
         if not results:
@@ -188,14 +193,13 @@ class ConversationRetriever:
                     role = msg['role'] or 'user'
                     author = msg['author'] or 'Unknown'
                     msg_content = msg['content'] or '[No content]'
-                    is_match = msg.get('is_match', False)
+                    # is_match = msg.get('is_match', False)
                     
                     if len(msg_content) > 150:
                         msg_content = msg_content[:150] + "..."
                     
                     emoji = "🤖" if role == "assistant" else "👤"
-                    match_indicator = " ⭐ [MATCH]" if is_match else ""
-                    print(f"\n  {emoji} Message {j} ({author}){match_indicator}:")
+                    print(f"\n  {emoji} Message {j} ({author}):")
                     for line in msg_content.split('\n')[:3]:
                         print(f"     {line}")
         
@@ -212,10 +216,11 @@ def main():
     parser.add_argument("--domain", help="Filter by domain (programming, web_dev, etc.)")
     parser.add_argument("--no-context", action="store_true", help="Don't show conversation context")
     parser.add_argument("--interactive", "-i", action="store_true", help="Interactive mode")
+    parser.add_argument("--json", action="store_true", help="Output as JSON (for programmatic use)")
     
     args = parser.parse_args()
     
-    retriever = ConversationRetriever()
+    retriever = ConversationRetriever(quiet=args.json)
     
     try:
         if args.interactive or not args.query:
@@ -258,17 +263,29 @@ def main():
                 tags['complexity'] = args.complexity
             if args.domain:
                 tags['domain'] = args.domain
-            
-            retriever.search_and_display(
-                args.query,
-                limit=args.limit,
-                tags=tags if tags else None,
-                show_context=not args.no_context,
-            )
+            if args.json:
+                import json
+                results = retriever.vector_search(args.query, limit=args.limit, tags=tags if tags else None)
+                
+                for result in results:
+                    context = retriever.get_conversation_context(
+                        result['conversation_id'],
+                        matching_message_id=result.get('matching_message_id'),
+                        context_window=10
+                    )
+                    result['context_messages'] = context
+                
+                print(json.dumps(results, indent=2))
+            else:
+                retriever.search_and_display(
+                    args.query,
+                    limit=args.limit,
+                    tags=tags if tags else None,
+                    show_context=not args.no_context,
+                )
     
     finally:
         retriever.close()
-        print("\n👋 Goodbye!\n")
 
 
 if __name__ == '__main__':
