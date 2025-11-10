@@ -8,6 +8,8 @@
     "agent-v2": "tsx agent_v2.ts",
     "agent-v3": "tsx agent_v3.ts",
     "agent-v4": "tsx agent_v4.ts",
+    "agent-krish": "tsx agent_krish.ts",
+    "agent-finetuned": "tsx agent_finetuned_old.ts",
     "test-reaction": "tsx test_reaction.ts"
   },
   "dependencies": {

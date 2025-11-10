@@ -9,7 +9,7 @@ Send messages and run an AI agent using the Beeper Desktop API.
 ```bash
 BEEPER_ACCESS_TOKEN="your_token_here"
 OPENAI_API_KEY="your_openai_key_here"
-TARGET_PHONE="+1 123-456-7890"
+TARGET_PHONE="+1 123-456-7890"  # Optional: only needed for sending single test messages (test_message.ts)
 ```
 
 2. Get your Beeper access token:
@@ -43,7 +43,7 @@ npm run send
 Start the conversational agent that monitors and responds to messages:
 
 ```bash
-npm run agent-v3
+npm run agent-v4
 ```
 
 The agent will:
