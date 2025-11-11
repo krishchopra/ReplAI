@@ -258,8 +258,7 @@ async function retrieveMemory(
       "\n\n=== PAST CONVERSATION EXAMPLES (for style reference) ===\n";
     memoryContext +=
       "Here are some past messages for style inspiration and memory retrieval (when someone asks you about your past). The topics may not be related.\n";
-    memoryContext +=
-      "Focus on how Krish writes:\n";
+    memoryContext += "Focus on how Krish writes:\n";
     memoryContext += "- Phrasing patterns and word choice\n";
     memoryContext += "- Slang and abbreviations used\n";
     memoryContext += "- Message breaking and response length\n\n";
@@ -558,6 +557,18 @@ async function runAgent() {
 
             // Check for activation/deactivation commands
             if (messageText === "START") {
+              // Check if already activated
+              if (activatedChats.has(chat.id)) {
+                console.log(
+                  `⏭️  ${state.contactName} is already activated, ignoring duplicate START`
+                );
+                state.lastSeenSortKey = Math.max(
+                  state.lastSeenSortKey,
+                  msg.sortKey
+                );
+                continue;
+              }
+
               activatedChats.add(chat.id);
               console.log(`🟢 AI ACTIVATED for ${state.contactName}`);
 
